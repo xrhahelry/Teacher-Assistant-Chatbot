@@ -13,7 +13,7 @@ def chat():
     response = None
     if request.method == "POST":
         api_key = current_app.config["GEMINI_KEY"]
-        model_name = current_app.config["GM_FLASH"]
+        model_name = current_app.config["GM_FLASH2"]
         user_input = request.form.get("user_input")
         response = get_output(api_key, model_name, user_input)
     return render_template("chat.html", response=response)
