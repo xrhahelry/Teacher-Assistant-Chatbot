@@ -1,20 +1,55 @@
-{%extends "base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Chatbot{% endblock %}
 
 {% block body %}
+<style>
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    height: 90vh;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    max-width: 1000px;
+    margin: auto;
+    background: #fafafa;
+}
+.chat-history {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+.chat-message {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+.user-message {
+    background: #e0f7fa;
+    text-align: right;
+}
+.bot-message {
+    background: #f1f8e9;
+    text-align: left;
+}
+</style>
 <div class="chat-box">
     <h2>Chatbot</h2>
-    <form method="POST">
+    <div class="chat-history">
+        {% for msg in chat_history %}
+            <div class="chat-message {% if msg.sender == 'user' %}user-message{% else %}bot-message{% endif %}">
+                <strong>{{ 'You' if msg.sender == 'user' else 'Bot' }}:</strong>
+                {% if msg.sender == 'bot' %}
+                    <div>{{ msg.message|safe }}</div>
+                {% else %}
+                    <div>{{ msg.message }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <form method="POST" class="chat-input-area">
         <input type="text" name="user_input" class="chat-input" placeholder="Type a message..." required>
-        <br>
         <button type="submit">Send</button>
     </form>
-
-    {% if response %}
-        <div class="chat-response">
-            <strong>Bot:</strong> {{ response }}
-        </div>
-    {% endif %}
 </div>
 {% endblock %}
