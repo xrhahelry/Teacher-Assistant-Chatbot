@@ -8,3 +8,4 @@ class Config:
     GEMINI_KEY = os.getenv("GEMINI_KEY")
     GM_FLASH = os.getenv("GM_FLASH")
     GM_FLASH2 = os.getenv("GM_FLASH2")
+    SESSION_TYPE = "filesystem"
