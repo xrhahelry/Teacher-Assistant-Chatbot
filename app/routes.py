@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, request, session
+from flask import Blueprint, render_template, current_app, request, session ,redirect
 from .chatbot import get_output
 import markdown
 
@@ -6,7 +6,18 @@ views = Blueprint("views", __name__)
 
 @views.route("/")
 def home():
-    return render_template("index.html")
+    return render_template("home.html")
+
+@views.route("/tutorial ")
+def tutorial():
+    return render_template("tutorial.html")
+
+@views.route("/onboarding",methods=["GET","POST"])
+def onboarding():
+    if request.method == 'POST':
+        # save this setting to the user profie
+        return redirect("chat")
+    return render_template("onboarding.html")
 
 @views.route("/chat", methods=["GET", "POST"])
 def chat():
