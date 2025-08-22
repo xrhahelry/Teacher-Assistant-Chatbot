@@ -1,55 +1,765 @@
-{% extends "base.html" %}
+<!doctype html>
+<html lang="en">
 
-{% block title %}Chatbot{% endblock %}
-
-{% block body %}
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat - Teacher's Class Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
 <style>
-.chat-box {
-    display: flex;
-    flex-direction: column;
-    height: 90vh;
-    border: 1px solid #ccc;
-    padding: 1rem;
-    max-width: 1000px;
-    margin: auto;
-    background: #fafafa;
-}
-.chat-history {
-    flex: 1;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-}
-.chat-message {
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    border-radius: 8px;
-}
-.user-message {
-    background: #e0f7fa;
-    text-align: right;
-}
-.bot-message {
-    background: #f1f8e9;
-    text-align: left;
-}
+    /* Ensure proper height without preventing scroll */
+    main {
+        height: 100vh !important;
+        /* Full viewport height since no header */
+        overflow: hidden !important;
+        /* Only hide main overflow, not content areas */
+    }
+
+    /* Ensure scrollable containers work properly */
+    .scroll-container {
+        overflow-y: auto !important;
+        scrollbar-width: thin;
+    }
+
+    /* Custom scrollbar for sidebar */
+    .sidebar-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-track {
+        background: #F9FAFB;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+        background: #D1D5DB;
+        border-radius: 3px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+        background: #9CA3AF;
+    }
+
+    /* Custom scrollbar for chat area */
+    .chat-scroll::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-scroll::-webkit-scrollbar-track {
+        background: #F9FAFB;
+    }
+
+    .chat-scroll::-webkit-scrollbar-thumb {
+        background: #D1D5DB;
+        border-radius: 4px;
+    }
+
+    .chat-scroll::-webkit-scrollbar-thumb:hover {
+        background: #9CA3AF;
+    }
+
+    /* Firefox scrollbar styling */
+    .sidebar-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #D1D5DB #F9FAFB;
+    }
+
+    .chat-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #D1D5DB #F9FAFB;
+    }
 </style>
-<div class="chat-box">
-    <h2>Chatbot</h2>
-    <div class="chat-history">
-        {% for msg in chat_history %}
-            <div class="chat-message {% if msg.sender == 'user' %}user-message{% else %}bot-message{% endif %}">
-                <strong>{{ 'You' if msg.sender == 'user' else 'Bot' }}:</strong>
-                {% if msg.sender == 'bot' %}
-                    <div>{{ msg.message|safe }}</div>
-                {% else %}
-                    <div>{{ msg.message }}</div>
-                {% endif %}
+
+<body class="bg-white min-h-screen flex flex-col">
+    <!-- Main Content -->
+    <main class="flex-1">
+
+        <div class="flex h-full bg-white relative w-full">
+            <!-- Sidebar for Chat History -->
+            <div id="sidebar"
+                class="w-80 bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50 h-full">
+                <!-- Sidebar Header -->
+                <div class="p-4 border-b border-gray-200 flex-shrink-0">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-900">Chat History</h2>
+                        <button id="closeSidebar" class="text-gray-400 hover:text-gray-600 lg:hidden">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <a href="{{ url_for('views.chat') }}"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        New Chat
+                    </a>
+                </div>
+
+                <!-- Chat History List -->
+                <div class="flex-1 sidebar-scroll overflow-y-auto" style="min-height: 0;">
+                    <div class="p-4">
+                        <div class="mb-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-gray-400 text-sm font-medium">Chats</span>
+                                <span class="text-gray-500 text-xs">15 saved</span>
+                            </div>
+                        </div>
+
+                        <!-- Chats box -->
+                        <div class="mb-6">
+                            <div class="space-y-2">
+                                <!-- Sample Chat Items -->
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">English Literature
+                                            Discussion</p>
+                                        <p class="text-gray-400 text-xs">Today</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Mathematics Lesson Plan
+                                        </p>
+                                        <p class="text-gray-400 text-xs">Yesterday</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Biology Quiz Questions</p>
+                                        <p class="text-gray-400 text-xs">2 days ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">History Essay Topics</p>
+                                        <p class="text-gray-400 text-xs">1 week ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Physics Problem Set</p>
+                                        <p class="text-gray-400 text-xs">1 week ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Chemistry Lab Instructions
+                                        </p>
+                                        <p class="text-gray-400 text-xs">2 weeks ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Geography Map Quiz</p>
+                                        <p class="text-gray-400 text-xs">2 weeks ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Spanish Vocabulary
+                                            Practice</p>
+                                        <p class="text-gray-400 text-xs">3 weeks ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Art History Analysis</p>
+                                        <p class="text-gray-400 text-xs">3 weeks ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Computer Science
+                                            Algorithms</p>
+                                        <p class="text-gray-400 text-xs">1 month ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Psychology Case Studies
+                                        </p>
+                                        <p class="text-gray-400 text-xs">1 month ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Economics Market Analysis
+                                        </p>
+                                        <p class="text-gray-400 text-xs">1 month ago</p>
+                                    </div>
+                                </div>
+
+                                <!-- Additional chat items for testing scroll -->
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Philosophy Ethics
+                                            Discussion</p>
+                                        <p class="text-gray-400 text-xs">2 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Statistics Data Analysis
+                                        </p>
+                                        <p class="text-gray-400 text-xs">2 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Creative Writing Workshop
+                                        </p>
+                                        <p class="text-gray-400 text-xs">3 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Environmental Science Lab
+                                        </p>
+                                        <p class="text-gray-400 text-xs">3 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Music Theory Fundamentals
+                                        </p>
+                                        <p class="text-gray-400 text-xs">4 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Physical Education
+                                            Planning</p>
+                                        <p class="text-gray-400 text-xs">4 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Foreign Language Immersion
+                                        </p>
+                                        <p class="text-gray-400 text-xs">5 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Social Studies Project</p>
+                                        <p class="text-gray-400 text-xs">5 months ago</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-gray-900 text-sm font-medium truncate">Technology Integration</p>
+                                        <p class="text-gray-400 text-xs">6 months ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    </div>
-    <form method="POST" class="chat-input-area">
-        <input type="text" name="user_input" class="chat-input" placeholder="Type a message..." required>
-        <button type="submit">Send</button>
-    </form>
-</div>
-{% endblock %}
+
+            <!-- Main Chat Area -->
+            <div class="flex-1 flex flex-col min-w-0 ml-80 relative h-screen">
+                <!-- Chat Header -->
+                <div
+                    class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0 w-full">
+                    <div class="flex items-center w-full">
+                        <button id="toggleSidebar" class="mr-4 text-gray-500 hover:text-gray-700 lg:hidden">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <div class="flex item-center justify-between w-full">
+                            <div>
+                                <h1 class="text-xl font-semibold text-gray-900">Teacher's AI Assistant</h1>
+                                <p class="text-sm text-gray-500">Generate lesson ideas and practice questions</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <a href="{{ url_for('views.tutorial') }}" class="py-1 px-6 bg-gray-100 hover:text-gray-600 rounded-lg">
+                                    ?
+                                </a> <a href="{{ url_for('views.home') }}" class="btn hover:scale-none py-1">
+                                   Home
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <!-- Chat Messages Area -->
+                <div class="flex-1 chat-scroll overflow-y-auto pb-24" style="min-height: 0;">
+                    <div class="p-6">
+                        <div class="max-w-4xl mx-auto">
+                            <!-- Welcome Message -->
+                            <div class="flex items-start mb-8">
+                                <div
+                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                        <div class="flex items-center mb-4">
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mr-3">
+                                                ✨
+                                            </span>
+                                            <span class="text-lg font-medium text-gray-900">Hey there! I'm your helpful
+                                                virtual assistant.</span>
+                                        </div>
+
+                                        <div class="space-y-4 text-gray-700">
+                                            <p><strong>Ask Anything:</strong> Curious mind? Shoot any question, big or
+                                                small.</p>
+                                            <p><strong>Generate Ideas:</strong> I've got tons of ideas to boost your
+                                                creativity.</p>
+                                            <p><strong>Provide Assistance:</strong> Stuck with something? Let me help
+                                                you out!</p>
+                                            <p><strong>Write Essays:</strong> From college papers to fun tales, I've got
+                                                your back.</p>
+                                            <p><strong>Get Suggestions:</strong> Movie night? Food cravings? I've got
+                                                many tips!</p>
+                                            <p><strong>Plan Adventures:</strong> Ready for a journey? Let's map out
+                                                something epic together!</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample Long Bot Response to Test Scrolling -->
+                            <div class="flex items-start mb-8">
+                                <div
+                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                        <div class="prose max-w-none">
+                                            <h3>Sample Mathematics Lesson Plan: Algebra Basics</h3>
+                                            <p>Here's a comprehensive lesson plan for teaching algebra basics to high
+                                                school students:</p>
+
+                                            <h4>Learning Objectives:</h4>
+                                            <ul>
+                                                <li>Students will understand the concept of variables and constants</li>
+                                                <li>Students will learn to solve simple linear equations</li>
+                                                <li>Students will practice applying algebraic concepts to real-world
+                                                    problems</li>
+                                            </ul>
+
+                                            <h4>Lesson Structure (45 minutes):</h4>
+                                            <ol>
+                                                <li><strong>Introduction (10 minutes)</strong> - Review previous math
+                                                    concepts and introduce algebra</li>
+                                                <li><strong>Direct Instruction (15 minutes)</strong> - Explain
+                                                    variables, constants, and basic operations</li>
+                                                <li><strong>Guided Practice (15 minutes)</strong> - Work through example
+                                                    problems together</li>
+                                                <li><strong>Independent Practice (5 minutes)</strong> - Students solve
+                                                    problems individually</li>
+                                            </ol>
+
+                                            <h4>Materials Needed:</h4>
+                                            <ul>
+                                                <li>Whiteboard and markers</li>
+                                                <li>Student worksheets</li>
+                                                <li>Calculators (optional)</li>
+                                                <li>Real-world problem examples</li>
+                                            </ul>
+
+                                            <h4>Assessment:</h4>
+                                            <p>Students will be assessed through:</p>
+                                            <ul>
+                                                <li>Participation in class discussions</li>
+                                                <li>Accuracy in guided practice problems</li>
+                                                <li>Completion of independent practice worksheet</li>
+                                                <li>Exit ticket with one algebra problem</li>
+                                            </ul>
+
+                                            <h4>Homework Assignment:</h4>
+                                            <p>Complete worksheet problems 1-20, focusing on simple linear equations and
+                                                variable identification.</p>
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div
+                                            class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                                            <div class="flex items-center space-x-3">
+                                                <button
+                                                    class="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                                        </path>
+                                                    </svg>
+                                                    Regenerate
+                                                </button>
+                                                <button
+                                                    class="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                                        </path>
+                                                    </svg>
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample User Message -->
+                            <div class="flex items-start justify-end mb-8">
+                                <div class="max-w-xs lg:max-w-md">
+                                    <div class="bg-blue-600 text-white rounded-lg p-4">
+                                        <p>Can you create practice questions for this lesson?</p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
+                                    <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Another Long Bot Response -->
+                            <div class="flex items-start mb-8">
+                                <div
+                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                        <div class="prose max-w-none">
+                                            <h3>Practice Questions: Algebra Basics</h3>
+
+                                            <h4>Section A: Variable Identification</h4>
+                                            <ol>
+                                                <li>In the expression 3x + 7, identify the variable and constant.</li>
+                                                <li>Which of the following are variables: a, 5, y, 12, z?</li>
+                                                <li>Write an expression that has 2 variables and 1 constant.</li>
+                                            </ol>
+
+                                            <h4>Section B: Simple Equations</h4>
+                                            <ol start="4">
+                                                <li>Solve for x: x + 5 = 12</li>
+                                                <li>Solve for y: 2y = 16</li>
+                                                <li>Solve for z: z - 3 = 9</li>
+                                                <li>Solve for a: 3a + 2 = 14</li>
+                                            </ol>
+
+                                            <h4>Section C: Word Problems</h4>
+                                            <ol start="8">
+                                                <li>Sarah has x apples. After buying 5 more apples, she has 12 apples
+                                                    total. How many apples did Sarah have initially?</li>
+                                                <li>A rectangle has a length of 8 units and width of w units. If the
+                                                    perimeter is 24 units, what is the width?</li>
+                                                <li>Tom saves $5 each week. After n weeks, he has saved $35. How many
+                                                    weeks has Tom been saving?</li>
+                                            </ol>
+
+                                            <h4>Answer Key:</h4>
+                                            <ol>
+                                                <li>Variable: x, Constant: 7</li>
+                                                <li>Variables: a, y, z</li>
+                                                <li>Example: 4x + 2y + 9</li>
+                                                <li>x = 7</li>
+                                                <li>y = 8</li>
+                                                <li>z = 12</li>
+                                                <li>a = 4</li>
+                                                <li>x = 7 apples</li>
+                                                <li>w = 4 units</li>
+                                                <li>n = 7 weeks</li>
+                                            </ol>
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div
+                                            class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                                            <div class="flex items-center space-x-3">
+                                                <button
+                                                    class="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                                        </path>
+                                                    </svg>
+                                                    Regenerate
+                                                </button>
+                                                <button
+                                                    class="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                                        </path>
+                                                    </svg>
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chat History Display -->
+                            {% if chat_history and chat_history|length > 0 %}
+                            {% for msg in chat_history %}
+                            {% if msg.sender == 'user' %}
+                            <!-- User Message -->
+                            <div class="flex items-start justify-end mb-8">
+                                <div class="max-w-xs lg:max-w-md">
+                                    <div class="bg-blue-600 text-white rounded-lg p-4">
+                                        <p>{{ msg.message }}</p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
+                                    <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            {% elif msg.sender == 'bot' %}
+                            <!-- Bot Message -->
+                            <div class="flex items-start mb-8">
+                                <div
+                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
+                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                        <div class="prose max-w-none">
+                                            {{ msg.message|safe }}
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div
+                                            class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                                            <div class="flex items-center space-x-3">
+                                                <button
+                                                    class="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                                        </path>
+                                                    </svg>
+                                                    Regenerate
+                                                </button>
+                                                <button
+                                                    class="flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                                        </path>
+                                                    </svg>
+                                                    Copy
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fixed Chat Input at Bottom -->
+                <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+                    <div class="max-w-4xl mx-auto">
+                        <form method="POST" class="flex items-center space-x-4">
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <textarea name="user_input" id="chatInput" rows="1"
+                                        class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors max-h-32"
+                                        placeholder="Ask me anything about lesson planning, quizzes, or teaching materials..."
+                                        required></textarea>
+
+                                </div>
+                            </div>
+
+                            <!-- Send Button -->
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+                                id="sendButton">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendButton');
+
+            // Initial state - disable send button if input is empty
+            if (sendButton && chatInput) {
+                sendButton.disabled = chatInput.value.trim() === '';
+            }
+
+            // Toggle sidebar on mobile
+            toggleSidebar?.addEventListener('click', function () {
+                sidebar.classList.toggle('-translate-x-full');
+                sidebarOverlay.classList.toggle('hidden');
+            });
+
+            // Close sidebar
+            closeSidebar?.addEventListener('click', function () {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            });
+
+            // Close sidebar when clicking overlay
+            sidebarOverlay?.addEventListener('click', function () {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            });
+
+            // Auto-resize textarea
+            chatInput?.addEventListener('input', function () {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 128) + 'px'; // Max height of 128px (max-h-32)
+
+                // Enable/disable send button based on content
+                if (sendButton) {
+                    sendButton.disabled = this.value.trim() === '';
+                }
+            });
+
+            // Handle keyboard shortcuts
+            chatInput?.addEventListener('keydown', function (e) {
+                // Submit on Enter (but not Shift+Enter)
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const form = document.querySelector('form');
+                    if (this.value.trim() !== '') {
+                        form?.dispatchEvent(new Event('submit', { cancelable: true }));
+                    }
+                }
+            });
+
+            // Handle form submission
+            const form = document.querySelector('form');
+
+            form?.addEventListener('submit', function (e) {
+                if (chatInput.value.trim() === '') {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Disable send button during submission
+                if (sendButton) {
+                    sendButton.disabled = true;
+                }
+
+                // Add user message to chat immediately
+                const userMessage = chatInput.value;
+                addUserMessage(userMessage);
+                chatInput.value = '';
+                chatInput.style.height = 'auto';
+            });
+
+            function addUserMessage(message) {
+                const chatArea = document.querySelector('.overflow-y-auto');
+                const messageHtml = `
+      <div class="flex items-start justify-end mb-8">
+        <div class="max-w-xs lg:max-w-md">
+          <div class="bg-blue-600 text-white rounded-lg p-4">
+            <p>${message}</p>
+          </div>
+        </div>
+        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
+          <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+          </svg>
+        </div>
+      </div>
+    `;
+
+                const messagesContainer = chatArea.querySelector('.max-w-4xl');
+                messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+
+            // Handle sidebar responsive behavior
+            function handleResize() {
+                if (window.innerWidth >= 1024) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebarOverlay.classList.add('hidden');
+                } else {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            }
+
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Initial call
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

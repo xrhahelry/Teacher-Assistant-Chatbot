@@ -1,6 +1,7 @@
 from flask import Flask
 from config import Config
 from flask_session import Session
+import os
 
 def create_app():
     app = Flask(__name__)

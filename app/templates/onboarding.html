@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Chat - Teacher's Class Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 xl:py-12">
+  <!-- Header Section -->
+  <div class="mb-8 text-center sm:text-left">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">Generate Lesson Ideas and Practice Questions</h1>
+  </div>
+
+  <!-- Main Form Container -->
+  <div class="max-w-2xl mx-auto">
+    <form method="POST" action="{{ url_for('views.chat') }}" class="space-y-6">
+      
+      <!-- Academic Level -->
+      <div>
+        <label for="academic_level" class="block text-lg font-medium text-gray-900 mb-4">
+          Academic Level
+        </label>
+        <input
+          type="text"
+          id="academic_level"
+          name="academic_level"
+          class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          placeholder="e.g., Grade 5, High School, Undergraduate, etc."
+          required
+        />
+      </div>
+
+      <!-- Subject -->
+      <div>
+        <label for="subject" class="block text-lg font-medium text-gray-900 mb-4">
+          Subject
+        </label>
+        <input
+          type="text"
+          id="subject"
+          name="subject"
+          class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          placeholder="e.g., Mathematics, Biology, English Literature, etc."
+          required
+        />
+      </div>
+
+      <!-- Help Text -->
+      <div class="mt-8 text-center sm:text-left">
+        <p class="text-gray-600 text-base">
+          Fill in the basic information above to get started with your personalized lesson planning assistant.
+        </p>
+        <p class="text-gray-500 text-sm mt-2">
+          You can always modify these settings later in your chat session.
+        </p>
+      </div>
+      
+
+      <!-- Create New Chat Button -->
+      <div class="flex justify-end pt-6">
+        <button
+          type="submit"
+          class="btn"
+        >
+          Create New Chat
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus on first input
+    const firstInput = document.getElementById('academic_level');
+    if (firstInput) {
+      firstInput.focus();
+    }
+
+    // Add smooth animations
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function() {
+      const button = form.querySelector('button[type="submit"]');
+      button.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Creating Chat...
+      `;
+      button.disabled = true;
+    });
+
+    // Enhanced form validation
+    const inputs = form.querySelectorAll('input[required]');
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+          this.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+          this.classList.remove('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
+        } else {
+          this.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+          this.classList.add('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,34 +1,106 @@
 {% extends "base.html" %}
 
-{% block title %}HomePage{% endblock %}
+{% block title %}Teacher's Class Assistant - Generate Lesson Ideas and Practice Questions with AI{% endblock %}
 
-{% block styles %}
-<style>
-    body { font-family: Arial, sans-serif; margin: 0; }
-    nav {
-        background-color: #333;
-        padding: 10px;
-    }
-    nav a {
-        color: white;
-        text-decoration: none;
-        margin-right: 15px;
-        font-weight: bold;
-    }
-    nav a:hover {
-        text-decoration: underline;
-    }
-    .container {
-        padding: 20px;
-    }
-</style>
-{% endblock %}
+{% block content %}
+<!-- Hero Section -->
+<div class="relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+    <div class="relative">
+      <!-- Background Image/Illustration -->
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="w-full max-w-4xl h-80 bg-gradient-to-br from-gray-300 to-gray-400 rounded-2xl flex items-center justify-center relative overflow-hidden">
+          <!-- People Illustration Placeholder -->
+          <div class="flex items-end space-x-8">
+            <!-- Person 1 -->
+            <div class="w-16 h-32 bg-blue-800 rounded-t-full relative">
+              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-yellow-600 rounded-full"></div>
+            </div>
+            <!-- Person 2 -->
+            <div class="w-16 h-36 bg-green-700 rounded-t-full relative">
+              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-orange-500 rounded-full"></div>
+            </div>
+            <!-- Person 3 -->
+            <div class="w-16 h-28 bg-orange-600 rounded-t-full relative">
+              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-pink-400 rounded-full"></div>
+            </div>
+            <!-- Person 4 -->
+            <div class="w-16 h-34 bg-yellow-700 rounded-t-full relative">
+              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-brown-500 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Hero Content -->
+      <div class="relative z-10 text-center">
+        <div class="max-w-3xl mx-auto">
+          <h1 class="text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            Generate lesson ideas and practice questions with AI
+          </h1>
+          <p class="text-xl text-white mb-8 drop-shadow-md max-w-2xl mx-auto">
+            Class Assistant Chatbot is a web-based AI tool designed to help university lecturers quickly generate structured lesson ideas and topic-specific practice questions.
+          </p>
+          <a href="{{ url_for('views.chat') }}" 
+             class="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition duration-150 ease-in-out transform hover:scale-105">
+            Get Started
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-{% block body %}
-<nav>
-    <a href="{{ url_for('views.home') }}">Home</a>
-    <a href="{{ url_for('views.chat') }}">Chat</a>
-</nav>
+<!-- How it works Section -->
+<div class="bg-white py-16 lg:py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl font-bold text-gray-900 mb-4">How it works</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Class Assistant Chatbot helps you create engaging lessons and practice questions.
+      </p>
+    </div>
 
-<h1>Home Page</h1>
+    <!-- Feature Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+      <!-- Generate Lesson Ideas -->
+      <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition duration-300">
+        <div class="flex items-center mb-6">
+          <div class="flex-shrink-0 mr-4">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+            </div>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900">Generate Lesson Ideas</h3>
+        </div>
+        <p class="text-gray-600 leading-relaxed">
+          Quickly generate structured lesson ideas tailored to your course topics.
+        </p>
+      </div>
+
+      <!-- Create Practice Questions -->
+      <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition duration-300">
+        <div class="flex items-center mb-6">
+          <div class="flex-shrink-0 mr-4">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900">Create Practice Questions</h3>
+        </div>
+        <p class="text-gray-600 leading-relaxed">
+          Develop topic-specific practice questions to reinforce learning and assess student understanding.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 {% endblock %}

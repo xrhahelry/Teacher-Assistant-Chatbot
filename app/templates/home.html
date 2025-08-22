@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher's Class Assistant - Generate Lesson Ideas and Practice Questions with AI{% endblock %}
+
+{% block content %}
+<div class="px-6 sm:px-8 lg:px-32">
+<!-- Hero Section -->
+<div class="relative overflow-hidden ">
+    <div class="max-w-7xl mx-auto py-8 md:py-12 lg:py-16">
+        <div class="relative h-[450px] rounded-2xl overflow-hidden shadow-2xl">
+            <!-- Background Image -->
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style="background-image: url('{{ url_for('static', filename='img/hero.jpg') }}');">
+            </div>
+
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-300/70 via-gray-400/60 to-gray-500/70 rounded-2xl"></div>
+            
+            <!-- Hero Content -->
+            <div class="relative z-10 flex items-center justify-center h-full px-8 sm:px-12 lg:px-16">
+                <div class="text-center max-w-4xl mx-auto">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-8 drop-shadow-2xl leading-tight">
+                        Generate lesson ideas and practice questions with AI
+                    </h1>
+                    <p class="text-lg sm:text-xl text-white/95 mb-10 drop-shadow-lg max-w-3xl mx-auto leading-relaxed">
+                        Class Assistant Chatbot is a web-based AI tool designed to help university lecturers quickly generate structured lesson ideas and topic-specific practice questions.
+                    </p>
+                    <a href="{{ url_for('views.onboarding') }}"
+                        class="btn">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How it works Section -->
+<div class="bg-white py-16 pt-8 lg:py-28 lg:pt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-10">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">How it works</h2>
+            <p class="text-xl text-gray-600 max-w-2xl ">
+                Class Assistant Chatbot helps you create engaging lessons and practice questions.
+            </p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+            <!-- Generate Lesson Ideas -->
+            <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition duration-300">
+                <div class="flex items-start mb-6">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Generate Lesson Ideas</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Quickly generate structured lesson ideas tailored to your course topics.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create Practice Questions -->
+            <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition duration-300">
+                <div class="flex items-start mb-6">
+                    <div class="flex-shrink-0 mr-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Create Practice Questions</h3>
+                        <p class="text-gray-600 leading-relaxed">
+                            Develop topic-specific practice questions to reinforce learning and assess student understanding.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+</div>
+{% include 'components/footer.html' %}
+{% endblock %}
