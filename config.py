@@ -8,4 +8,8 @@ class Config:
     GEMINI_KEY = os.getenv("GEMINI_KEY")
     GM_FLASH = os.getenv("GM_FLASH")
     GM_FLASH2 = os.getenv("GM_FLASH2")
-    SESSION_TYPE = "filesystem"
+    GM_FLASH2 = os.getenv("GM_FLASH2")
+    GM_FLASH2 = os.getenv("GM_FLASH2")
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv("SQLALCHEMY_TRACK_MODIFICATIONS") 
+    SESSION_TYPE = os.getenv("SESSION_TYPE")

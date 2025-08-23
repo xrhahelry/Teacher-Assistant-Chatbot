@@ -43,26 +43,38 @@
               <li>
                 <a href="{{ url_for('views.tutorial') }}"
                   class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                  tutorial
+                  Tutorial
                 </a>
               <li>
-                <a href="{{ url_for('views.chat') }}"
+                <a href="{{ url_for('views.onboarding') }}"
                   class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
                   Chat
                 </a>
               </li>
               <li>
-                <a href="#"
+                <a href="{{ url_for('views.history') }}"
                   class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
-                  Login
+                  History
                 </a>
               </li>
-              <li>
-                <a href="{{ url_for('views.onboarding') }}"
-                  class="btn">
-                  Get Started
-                </a>
-              </li>
+              {% if session.get("username") %}
+                <li>
+                  <span class="text-blue-600 font-semibold px-3 py-2">{{ session["username"] }}</span>
+                </li>
+                <li>
+                  <a href="{{ url_for('views.logout') }}"
+                    class="text-gray-500 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                    Logout
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a href="{{ url_for('views.login')}}"
+                    class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                    Login/Signup
+                  </a>
+                </li>
+              {% endif %}
             </ol>
           </nav>
         </div>

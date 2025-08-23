@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Chat History</h2>
+<ul>
+    {% for thread in threads %}
+        <li><a href="{{ url_for('views.chat', thread_id=thread.id) }}">{{ thread.title }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
