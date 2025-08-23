@@ -81,22 +81,22 @@ def onboarding():
         return redirect(url_for("views.chat", thread_id=thread.id))
     return render_template("onboarding.html")
 
-@views.route("/history", methods=["GET", "POST"])
-def history():
+@views.route("/chat")
+def chat_latest():
     if not session.get("user_id"):
         return redirect(url_for("views.login"))
+    
     user_id = session["user_id"]
-
-    if request.method == "POST":
-        title = request.form.get("title")
-        if title:
-            thread = ChatThread(user_id=session["user_id"], title=title)
-            db.session.add(thread)
-            db.session.commit()
-            return redirect(url_for("views.chat", thread_id=thread.id))
-
-    user_threads = ChatThread.query.filter_by(user_id=session["user_id"]).order_by(ChatThread.created_at.desc()).all()
-    return render_template("history.html", threads=user_threads)
+    
+    # Get the user's most recent chat thread
+    latest_thread = ChatThread.query.filter_by(user_id=user_id).order_by(ChatThread.created_at.desc()).first()
+    
+    if latest_thread:
+        # Redirect to the latest chat thread
+        return redirect(url_for("views.chat", thread_id=latest_thread.id))
+    else:
+        # If no chat threads exist, redirect to onboarding to create the first one
+        return redirect(url_for("views.onboarding"))
 
 @views.route("/chat/<int:thread_id>", methods=["GET", "POST"])
 def chat(thread_id):
@@ -106,6 +106,10 @@ def chat(thread_id):
     thread = ChatThread.query.filter_by(id=thread_id, user_id=user_id).first_or_404()
     user = User.query.get(user_id)
     chat_history = Chat.query.filter_by(thread_id=thread_id).order_by(Chat.timestamp).all()
+    
+    # Fetch user's chat threads for sidebar
+    user_threads = ChatThread.query.filter_by(user_id=user_id).order_by(ChatThread.created_at.desc()).all()
+    
     response = None
 
     if request.method == "POST":
@@ -156,4 +160,4 @@ def chat(thread_id):
         else:
             rendered_history.append({"sender": "user", "message": msg.message})
 
-    return render_template("chat.html", response=response, chat_history=rendered_history, thread=thread, user=user)
+    return render_template("chat.html", response=response, chat_history=rendered_history, thread=thread, user=user, threads=user_threads)
