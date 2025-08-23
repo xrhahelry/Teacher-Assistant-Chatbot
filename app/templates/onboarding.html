@@ -11,7 +11,22 @@
 
   <!-- Main Form Container -->
   <div class="max-w-2xl mx-auto">
-    <form method="POST" action="{{ url_for('views.chat') }}" class="space-y-6">
+    <form method="POST" class="space-y-6">
+
+      <!-- Chat Title -->
+      <div>
+        <label for="chat_title" class="block text-lg font-medium text-gray-900 mb-4">
+          Chat Title
+        </label>
+        <input
+          type="text"
+          id="chat_title"
+          name="chat_title"
+          class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          placeholder="e.g. Science 2022 Batch"
+          required
+        />
+      </div>
       
       <!-- Academic Level -->
       <div>
@@ -23,7 +38,7 @@
           id="academic_level"
           name="academic_level"
           class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          placeholder="e.g., Grade 5, High School, Undergraduate, etc."
+          placeholder="e.g. Grade 5, High School, Undergraduate, etc."
           required
         />
       </div>
