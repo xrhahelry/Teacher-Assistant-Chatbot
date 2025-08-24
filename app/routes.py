@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, current_app, request, session, redirect, url_for, flash
 from .chatbot import get_output
-import markdown
+import markdown, re
 from .models import db, User, Chat, ChatThread
 
 views = Blueprint("views", __name__)
@@ -8,12 +8,28 @@ views = Blueprint("views", __name__)
 @views.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
+        print("POST")
+        fullname = request.form["fullname"]
+        email = request.form["email"]
         username = request.form["username"]
         password = request.form["password"]
+        academic_level = request.form["academic-level"]
+        subject = request.form["default-subject"]
+
         if User.query.filter_by(username=username).first():
             flash("Username already exists")
             return redirect(url_for("views.signup"))
-        user = User(username=username)
+        if User.query.filter_by(email=email).first():
+            flash("Email already registered")
+            return redirect(url_for("views.signup"))
+
+        user = User(
+            username=username,
+            fullname=fullname,
+            email=email,
+            default_academic_level=academic_level,
+            default_subject=subject
+        )
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -98,6 +114,23 @@ def chat_latest():
         # If no chat threads exist, redirect to onboarding to create the first one
         return redirect(url_for("views.onboarding"))
 
+def preprocess_latex(text):
+    # Convert $...$ blocks containing \begin{...} to $$...$$
+    def block_replacer(match):
+        content = match.group(1)
+        if r"\begin{" in content:
+            return f"$$ {content} $$"
+        return f"${content}$"
+    text = re.sub(r"\$(.+?)\$", block_replacer, text, flags=re.DOTALL)
+
+    # Wrap bare \begin{pmatrix}...\end{pmatrix} blocks in $$...$$
+    text = re.sub(r"(?<!\$)(\\begin{pmatrix}.*?\\end{pmatrix})(?!\$)", r"$$ \1 $$", text, flags=re.DOTALL)
+
+    # Optionally, wrap other bare \begin{...}...\end{...} blocks in $$...$$
+    text = re.sub(r"(?<!\$)(\\begin{[a-zA-Z]+}.*?\\end{[a-zA-Z]+})(?!\$)", r"$$ \1 $$", text, flags=re.DOTALL)
+
+    return text
+
 @views.route("/chat/<int:thread_id>", methods=["GET", "POST"])
 def chat(thread_id):
     if not session.get("user_id"):
@@ -156,7 +189,8 @@ def chat(thread_id):
     rendered_history = []
     for msg in chat_history:
         if msg.sender == "bot":
-            rendered_history.append({"sender": "bot", "message": markdown.markdown(msg.message)})
+            processed_message = preprocess_latex(msg.message)
+            rendered_history.append({"sender": "bot", "message": markdown.markdown(processed_message, extensions=['nl2br'])})
         else:
             rendered_history.append({"sender": "user", "message": msg.message})
 

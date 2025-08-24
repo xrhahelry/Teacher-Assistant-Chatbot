@@ -8,7 +8,7 @@
     main {
         height: 100vh !important;
         /* Full viewport height since no header */
-        overflow: hidden !important;
+        /* overflow: hidden !important; */
         /* Only hide main overflow, not content areas */
     }
 
@@ -64,437 +64,456 @@
         scrollbar-width: thin;
         scrollbar-color: #D1D5DB #F9FAFB;
     }
+
+    .chat-input-sticky {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-    <!-- Main Content -->
-    <main class="flex-1">
+<!-- Main Content -->
+<main class="flex-1">
 
-        <div class="flex h-full bg-white relative w-full">
-            <!-- Sidebar for Chat History -->
-            <div id="sidebar"
-            class="w-72 bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50 h-full">
-                <!-- Sidebar Header -->
-                <div class="p-4 border-b border-gray-200 flex-shrink-0">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-semibold text-gray-900">Chat History</h2>
-                        <button id="closeSidebar" class="text-gray-400 hover:text-gray-600 lg:hidden">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                    <a href="{{ url_for('views.onboarding') }}"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="flex h-full bg-white relative w-full">
+        <!-- Sidebar for Chat History -->
+        <div id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50 h-full">
+            <!-- Sidebar Header -->
+            <div class="p-4 border-b border-gray-200 flex-shrink-0">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-900">Chat History</h2>
+                    <button id="closeSidebar" class="text-gray-400 hover:text-gray-600 lg:hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        New Chat
-                    </a>
+                    </button>
                 </div>
+                <a href="{{ url_for('views.onboarding') }}"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    New Chat
+                </a>
+            </div>
 
-                <!-- Chat History List -->
-                <div class="flex-1 sidebar-scroll overflow-y-auto" style="min-height: 0;">
-                    <div class="p-4">
-                        <div class="mb-6">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-gray-400 text-sm font-medium">Chats</span>
+            <!-- Chat History List -->
+            <div class="flex-1 sidebar-scroll overflow-y-auto" style="min-height: 0;">
+                <div class="p-4">
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-400 text-sm font-medium">Chats</span>
                             <span class="text-gray-500 text-xs">{{ threads|length if threads else 0 }} saved</span>
-                            </div>
                         </div>
+                    </div>
 
                     <!-- Dynamic Chat History -->
                     {% if threads and threads|length > 0 %}
-                        <div class="mb-6">
-                            <div class="space-y-2">
+                    <div class="mb-6">
+                        <div class="space-y-2">
                             {% for thread in threads %}
-                            <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer chat-thread-item" 
-                                 data-thread-id="{{ thread.id }}">
-                                    <div class="flex-1 min-w-0">
+                            <div class="flex items-center p-3 rounded-lg hover:bg-gray-100 cursor-pointer chat-thread-item"
+                                data-thread-id="{{ thread.id }}">
+                                <div class="flex-1 min-w-0">
                                     <p class="text-gray-900 text-sm font-medium truncate">{{ thread.title }}</p>
                                     <p class="text-gray-400 text-xs">
                                         {% if thread.created_at %}
-                                            {{ thread.created_at.strftime('%b %d') if thread.created_at else 'Recently' }}
+                                        {{ thread.created_at.strftime('%b %d') if thread.created_at else 'Recently' }}
                                         {% else %}
-                                            Recently
+                                        Recently
                                         {% endif %}
                                     </p>
-                                    </div>
                                 </div>
+                            </div>
                             {% endfor %}
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
                     {% else %}
                     <!-- Empty State -->
                     <div class="text-center py-8">
                         <div class="text-gray-400 mb-2">
                             <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                </path>
                             </svg>
-                                    </div>
+                        </div>
                         <p class="text-gray-500 text-sm">No chat history yet</p>
                         <p class="text-gray-400 text-xs">Start a new chat to begin</p>
-                                </div>
+                    </div>
                     {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Chat Area -->
-        <div class="flex-1 flex flex-col min-w-0 ml-72 relative h-screen">
-                <!-- Chat Messages Area -->
-                <div class="flex-1 chat-scroll overflow-y-auto pb-24" style="min-height: 0;">
-                    <div class="p-6">
-                        <div class="max-w-4xl mx-auto">
-                            <!-- Welcome Message -->
-                            <div class="flex items-start mb-8">
-                                <div
-                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
-                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                        <div class="flex items-center mb-4">
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mr-3">
-                                                ✨
-                                            </span>
-                                            <span class="text-lg font-medium text-gray-900">Hey there! I'm your helpful
-                                                virtual assistant.</span>
-                                        </div>
-
-                                        <div class="space-y-4 text-gray-700">
-                                            <p><strong>Ask Anything:</strong> Curious mind? Shoot any question, big or
-                                                small.</p>
-                                            <p><strong>Generate Ideas:</strong> I've got tons of ideas to boost your
-                                                creativity.</p>
-                                            <p><strong>Provide Assistance:</strong> Stuck with something? Let me help
-                                                you out!</p>
-                                            <p><strong>Write Essays:</strong> From college papers to fun tales, I've got
-                                                your back.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Chat History Display -->
-                            {% if chat_history and chat_history|length > 0 %}
-                            {% for msg in chat_history %}
-                            {% if msg.sender == 'user' %}
-                            <!-- User Message -->
-                            <div class="flex items-start justify-end mb-8">
-                                <div class="max-w-xs lg:max-w-md">
-                                    <div class="bg-blue-600 text-white rounded-lg p-4">
-                                        <p>{{ msg.message }}</p>
-                                    </div>
-                                </div>
-                                <div
-                                    class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
-                                    <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
-                                    </svg>
-                                </div>
-                            </div>
-                            {% elif msg.sender == 'bot' %}
-                            <!-- Bot Message -->
-                            <div class="flex items-start mb-8">
-                                <div
-                                    class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
-                                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                        <div class="prose max-w-none">
-                                            {{ msg.message|safe }}
-                                        </div>
-
-                                        <!-- Action Buttons -->
-                                        <div
-                                            class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-                                            <div class="flex items-center space-x-3">
-                                                <button
-                                                    class="regenerate-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                                        </path>
-                                                    </svg>
-                                                    Regenerate
-                                                </button>
-                                                <button
-                                                    class="copy-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
-                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                                        </path>
-                                                    </svg>
-                                                    Copy
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Fixed Chat Input at Bottom -->
-                <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
-                    <div class="max-w-4xl mx-auto">
-                        <form method="POST" class="flex items-center space-x-4">
-                            <div class="flex-1">
-                                <div class="relative">
-                                    <textarea name="user_input" id="chatInput" rows="1"
-                                        class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors max-h-32"
-                                        placeholder="Ask me anything about lesson planning, quizzes, or teaching materials..."
-                                        required></textarea>
-
-                                </div>
-                            </div>
-
-                            <!-- Send Button -->
-                            <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
-                                id="sendButton">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                </svg>
-                            </button>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Overlay for mobile sidebar -->
-        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col min-w-0 ml-72 relative h-screen">
+            <!-- Chat Messages Area -->
+            <div class="flex-1 chat-scroll overflow-y-auto pb-24" style="min-height: 0;">
+                <div class="p-6">
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Welcome Message -->
+                        <div class="flex items-start mb-8">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                    <div class="flex items-center mb-4">
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 mr-3">
+                                            ✨
+                                        </span>
+                                        <span class="text-lg font-medium text-gray-900">Hey there! I'm your helpful
+                                            virtual assistant.</span>
+                                    </div>
 
-    </main>
+                                    <div class="space-y-4 text-gray-700">
+                                        <p><strong>Ask Anything:</strong> Curious mind? Shoot any question, big or
+                                            small.</p>
+                                        <p><strong>Generate Ideas:</strong> I've got tons of ideas to boost your
+                                            creativity.</p>
+                                        <p><strong>Provide Assistance:</strong> Stuck with something? Let me help
+                                            you out!</p>
+                                        <p><strong>Write Essays:</strong> From college papers to fun tales, I've got
+                                            your back.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat History Display -->
+                        {% if chat_history and chat_history|length > 0 %}
+                        {% for msg in chat_history %}
+                        {% if msg.sender == 'user' %}
+                        <!-- User Message -->
+                        <div class="flex items-start justify-end mb-8">
+                            <div class="max-w-xs lg:max-w-md">
+                                <div class="bg-blue-600 text-white rounded-lg p-4">
+                                    <p>{{ msg.message }}</p>
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
+                                <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        {% elif msg.sender == 'bot' %}
+                        <!-- Bot Message -->
+                        <div class="flex items-start mb-8">
+                            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
+                                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                    <div class="prose max-w-none">
+                                        {{ msg.message|safe }}
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
+                                        <div class="flex items-center space-x-3">
+                                            <button
+                                                class="regenerate-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                                    </path>
+                                                </svg>
+                                                Regenerate
+                                            </button>
+                                            <button
+                                                class="copy-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                Copy
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Chat Input at Bottom -->
+            <div
+                class="chat-input-sticky absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+                <div class="max-w-4xl mx-auto">
+                    <form method="POST" class="flex items-center space-x-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <textarea name="user_input" id="chatInput" rows="1"
+                                    class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors max-h-32"
+                                    placeholder="Ask me anything about lesson planning, quizzes, or teaching materials..."
+                                    required></textarea>
+
+                            </div>
+                        </div>
+
+                        <!-- Send Button -->
+                        <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+                            id="sendButton">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+
+</main>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebar = document.getElementById('sidebar');
-            const toggleSidebar = document.getElementById('toggleSidebar');
-            const closeSidebar = document.getElementById('closeSidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            const chatInput = document.getElementById('chatInput');
-            const sendButton = document.getElementById('sendButton');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('sidebar');
+        const toggleSidebar = document.getElementById('toggleSidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
 
-            // Initial state - disable send button if input is empty
-            if (sendButton && chatInput) {
-                sendButton.disabled = chatInput.value.trim() === '';
+        // Initial state - disable send button if input is empty
+        if (sendButton && chatInput) {
+            sendButton.disabled = chatInput.value.trim() === '';
+        }
+
+        // Toggle sidebar on mobile
+        toggleSidebar?.addEventListener('click', function () {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarOverlay.classList.toggle('hidden');
+        });
+
+        // Close sidebar
+        closeSidebar?.addEventListener('click', function () {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        // Close sidebar when clicking overlay
+        sidebarOverlay?.addEventListener('click', function () {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        // Auto-resize textarea
+        chatInput?.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 128) + 'px'; // Max height of 128px (max-h-32)
+
+            // Enable/disable send button based on content
+            if (sendButton) {
+                sendButton.disabled = this.value.trim() === '';
+            }
+        });
+
+        // Handle keyboard shortcuts
+        chatInput?.addEventListener('keydown', function (e) {
+            // Submit on Enter (but not Shift+Enter)
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const form = document.querySelector('form');
+                if (this.value.trim() !== '') {
+                    form?.dispatchEvent(new Event('submit', { cancelable: true }));
+                }
+            }
+        });
+
+        // Handle form submission
+        const form = document.querySelector('form');
+
+        form?.addEventListener('submit', function (e) {
+            if (chatInput.value.trim() === '') {
+                e.preventDefault();
+                return;
             }
 
-            // Toggle sidebar on mobile
-            toggleSidebar?.addEventListener('click', function () {
-                sidebar.classList.toggle('-translate-x-full');
-                sidebarOverlay.classList.toggle('hidden');
-            });
+            // Disable send button during submission
+            if (sendButton) {
+                sendButton.disabled = true;
+            }
 
-            // Close sidebar
-            closeSidebar?.addEventListener('click', function () {
-                sidebar.classList.add('-translate-x-full');
-                sidebarOverlay.classList.add('hidden');
-            });
-
-            // Close sidebar when clicking overlay
-            sidebarOverlay?.addEventListener('click', function () {
-                sidebar.classList.add('-translate-x-full');
-                sidebarOverlay.classList.add('hidden');
-            });
-
-            // Auto-resize textarea
-            chatInput?.addEventListener('input', function () {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 128) + 'px'; // Max height of 128px (max-h-32)
-
-                // Enable/disable send button based on content
-                if (sendButton) {
-                    sendButton.disabled = this.value.trim() === '';
-                }
-            });
-
-            // Handle keyboard shortcuts
-            chatInput?.addEventListener('keydown', function (e) {
-                // Submit on Enter (but not Shift+Enter)
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    const form = document.querySelector('form');
-                    if (this.value.trim() !== '') {
-                        form?.dispatchEvent(new Event('submit', { cancelable: true }));
-                    }
-                }
-            });
-
-            // Handle form submission
-            const form = document.querySelector('form');
-
-            form?.addEventListener('submit', function (e) {
-                if (chatInput.value.trim() === '') {
-                    e.preventDefault();
-                    return;
-                }
-
-                // Disable send button during submission
-                if (sendButton) {
-                    sendButton.disabled = true;
-                }
-
-                // Add user message to chat immediately
-                const userMessage = chatInput.value;
-                addUserMessage(userMessage);
-                chatInput.value = '';
-                chatInput.style.height = 'auto';
-            });
-
-            function addUserMessage(message) {
-                const chatArea = document.querySelector('.overflow-y-auto');
-                const messageHtml = `
-      <div class="flex items-start justify-end mb-8">
-        <div class="max-w-xs lg:max-w-md">
-          <div class="bg-blue-600 text-white rounded-lg p-4">
-            <p>${message}</p>
-          </div>
-        </div>
-        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
-          <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
-          </svg>
-        </div>
-      </div>
-    `;
-
-                const messagesContainer = chatArea.querySelector('.max-w-4xl');
-                messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+            // Add user message to chat immediately
+            const userMessage = chatInput.value;
+            addUserMessage(userMessage);
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+        });
+        // Always scroll chat area to bottom
+        function scrollChatToBottom() {
+            const chatArea = document.querySelector('.chat-scroll.overflow-y-auto');
+            if (chatArea) {
                 chatArea.scrollTop = chatArea.scrollHeight;
             }
+        }
 
-            // Handle sidebar responsive behavior
-            function handleResize() {
-                if (window.innerWidth >= 1024) {
-                    sidebar.classList.remove('-translate-x-full');
-                    sidebarOverlay.classList.add('hidden');
-                } else {
-                    sidebar.classList.add('-translate-x-full');
+        // Scroll on page load
+        scrollChatToBottom();
+
+        function addUserMessage(message) {
+            const chatArea = document.querySelector('.overflow-y-auto');
+            const messageHtml = `
+            <div class="flex items-start justify-end mb-8">
+                <div class="max-w-xs lg:max-w-md">
+                <div class="bg-blue-600 text-white rounded-lg p-4">
+                    <p>${message}</p>
+                </div>
+                </div>
+                <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center ml-4 mt-1">
+                <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path>
+                </svg>
+                </div>
+            </div>
+            `;
+
+            const messagesContainer = chatArea.querySelector('.max-w-4xl');
+            messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // Handle sidebar responsive behavior
+        function handleResize() {
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        // Handle chat thread item clicks
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.chat-thread-item')) {
+                const threadId = e.target.closest('.chat-thread-item').dataset.threadId;
+                if (threadId) {
+                    window.location.href = `/chat/${threadId}`;
                 }
             }
 
-            // Handle chat thread item clicks
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.chat-thread-item')) {
-                    const threadId = e.target.closest('.chat-thread-item').dataset.threadId;
-                    if (threadId) {
-                        window.location.href = `/chat/${threadId}`;
-                    }
-                }
+            // Handle regenerate button clicks
+            if (e.target.closest('.regenerate-btn')) {
+                const regenerateBtn = e.target.closest('.regenerate-btn');
+                const messageContainer = regenerateBtn.closest('.flex.items-start.mb-8');
+                const messageText = messageContainer.querySelector('.prose').textContent;
 
-                // Handle regenerate button clicks
-                if (e.target.closest('.regenerate-btn')) {
-                    const regenerateBtn = e.target.closest('.regenerate-btn');
-                    const messageContainer = regenerateBtn.closest('.flex.items-start.mb-8');
-                    const messageText = messageContainer.querySelector('.prose').textContent;
-                    
-                    // Disable the button and show loading state
-                    regenerateBtn.disabled = true;
-                    regenerateBtn.innerHTML = `
+                // Disable the button and show loading state
+                regenerateBtn.disabled = true;
+                regenerateBtn.innerHTML = `
                         <svg class="w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
                         Regenerating...
                     `;
-                    
-                    // Simulate regeneration (you can replace this with actual API call)
-                    setTimeout(() => {
-                        // Re-enable button and restore original text
-                        regenerateBtn.disabled = false;
-                        regenerateBtn.innerHTML = `
+
+                // Simulate regeneration (you can replace this with actual API call)
+                setTimeout(() => {
+                    // Re-enable button and restore original text
+                    regenerateBtn.disabled = false;
+                    regenerateBtn.innerHTML = `
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                             </svg>
                             Regenerate
                         `;
-                        
-                        // Show success message
-                        showToast('Message regenerated successfully!');
-                    }, 2000);
-                }
 
-                // Handle copy button clicks
-                if (e.target.closest('.copy-btn')) {
-                    const copyBtn = e.target.closest('.copy-btn');
-                    const messageContainer = copyBtn.closest('.flex.items-start.mb-8');
-                    const messageText = messageContainer.querySelector('.prose').textContent;
-                    
-                    // Copy text to clipboard
-                    navigator.clipboard.writeText(messageText).then(() => {
-                        // Show success feedback
-                        const originalText = copyBtn.innerHTML;
-                        copyBtn.innerHTML = `
+                    // Show success message
+                    showToast('Message regenerated successfully!');
+                }, 2000);
+            }
+
+            // Handle copy button clicks
+            if (e.target.closest('.copy-btn')) {
+                const copyBtn = e.target.closest('.copy-btn');
+                const messageContainer = copyBtn.closest('.flex.items-start.mb-8');
+                const messageText = messageContainer.querySelector('.prose').textContent;
+
+                // Copy text to clipboard
+                navigator.clipboard.writeText(messageText).then(() => {
+                    // Show success feedback
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = `
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             Copied!
                         `;
-                        copyBtn.classList.add('text-green-600');
-                        
-                        // Reset button after 2 seconds
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalText;
-                            copyBtn.classList.remove('text-green-600');
-                        }, 2000);
-                        
-                        showToast('Message copied to clipboard!');
-                    }).catch(err => {
-                        console.error('Failed to copy text: ', err);
-                        showToast('Failed to copy message');
-                    });
-                }
-            });
+                    copyBtn.classList.add('text-green-600');
 
-            // Toast notification function
-            function showToast(message) {
-                // Create toast element
-                const toast = document.createElement('div');
-                toast.className = 'fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
-                toast.textContent = message;
-                
-                // Add to page
-                document.body.appendChild(toast);
-                
-                // Animate in
-                setTimeout(() => {
-                    toast.classList.remove('translate-x-full');
-                }, 100);
-                
-                // Remove after 3 seconds
-                setTimeout(() => {
-                    toast.classList.add('translate-x-full');
+                    // Reset button after 2 seconds
                     setTimeout(() => {
-                        document.body.removeChild(toast);
-                    }, 300);
-                }, 3000);
-            }
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.classList.remove('text-green-600');
+                    }, 2000);
 
-            window.addEventListener('resize', handleResize);
-            handleResize(); // Initial call
+                    showToast('Message copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showToast('Failed to copy message');
+                });
+            }
         });
-    </script>
+
+        // Toast notification function
+        function showToast(message) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+            toast.textContent = message;
+
+            // Add to page
+            document.body.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full');
+            }, 100);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
+    });
+</script>
 {% endblock %}
