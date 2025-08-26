@@ -78,20 +78,38 @@ def onboarding():
 
         # Generate instruction using academic_level and subject
         instruction = f"""
+            Your Role:
             You are a professional teaching assistant.
             Your job is to suggest engaging and accurate class activity ideas and evaluation questions for any topic.
-            Always answer in full sentences, in structured format, and never give false information.
-            You like to keep a professional setting while still being approachable.
             I teach {subject} to {academic_level} students.
+            The traits you should have is: 
+            Classroom Manager, Knowledge Organizer, Creative Faciliator, Empathetic Mentor, Global Thinker, Tech Savvy Guide.
+            You like to keep a professional setting while still being approachable.
+            The format of your output should be:
+            Always answer in full sentences, in structured format, and never give false information. Number the questions and activities. If possible use emojies where appropriate.
             I want you to generate:
             1. Three engaging in-class activities.
             2. Five practice questions with their corresponding answers.
-            The activities should have a short description only: title, one line purpose, and a short description of how the activity is to be done in class.
+            The activities should have a short description only: activity number:title , one line purpose, and a short description of how the activity is to be done in class.
             I may also ask you to change the activities or questions. So please make sure to remember the core topic and don't forget it.
         """
 
+        # Alternate instructions when the user want to do normal conversations about the topic.
+        altinstruction= f"""
+            Your Role:
+            You are a professional teaching assistant.
+            Your job is to assist me in making my class as effective, engaging and accurate as possible.
+            I teach {subject} to {academic_level} students.
+            The traits you should have is: 
+            Classroom Manager, Knowledge Organizer, Creative Faciliator, Empathetic Mentor, Global Thinker, Tech Savvy Guide.
+            You like to keep a professional setting while still being approachable.
+            The format of your output should be:
+            Always answer in full sentences, in structured format, and never give false information. If possible use emojis
+            I may also ask you to further refine the output. So please make sure to remember the core topic and don't forget it.
+        """
+
         # Create new chat thread
-        thread = ChatThread(user_id=user_id, title=title, instruction=instruction)
+        thread = ChatThread(user_id=user_id, title=title, instruction=instruction, altinstruction=altinstruction)
         db.session.add(thread)
         db.session.commit()
         return redirect(url_for("views.chat", thread_id=thread.id))
@@ -149,6 +167,8 @@ def chat(thread_id):
         api_key = current_app.config["GEMINI_KEY"]
         model_name = current_app.config["GM_FLASH2"]
         user_input = request.form.get("user_input")
+        choice = request.form.get("choice")
+        choice = "on"
 
         # Save user message
         user_msg = Chat(thread_id=thread_id, user_id=user_id, message=user_input, sender="user")
@@ -162,7 +182,11 @@ def chat(thread_id):
             context += f"{sender}: {msg.message}\n"
 
         # Use instruction from thread and name from user
-        instruction = thread.instruction
+        if choice == None:
+            instruction = thread.altinstruction
+        else:
+            instruction = thread.instruction
+
         name = user.username
 
         prompt = f"""
@@ -175,7 +199,6 @@ def chat(thread_id):
             {user_input}
         """
         response = get_output(api_key, model_name, prompt)
-        response_html = markdown.markdown(response)
 
         # Save bot response
         bot_msg = Chat(thread_id=thread_id, user_id=user_id, message=response, sender="bot")
@@ -189,8 +212,8 @@ def chat(thread_id):
     rendered_history = []
     for msg in chat_history:
         if msg.sender == "bot":
-            processed_message = preprocess_latex(msg.message)
-            rendered_history.append({"sender": "bot", "message": markdown.markdown(processed_message, extensions=['nl2br'])})
+            # processed_message = preprocess_latex(msg.message)
+            rendered_history.append({"sender": "bot", "message": markdown.markdown(msg.message, extensions=['nl2br', "fenced_code", "tables", "sane_lists"])})
         else:
             rendered_history.append({"sender": "user", "message": msg.message})
 

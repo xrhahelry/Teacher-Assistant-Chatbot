@@ -23,6 +23,7 @@ class ChatThread(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(100), nullable=False)
     instruction = db.Column(db.Text, nullable=False)
+    altinstruction = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     user = db.relationship('User', backref=db.backref('threads', lazy=True))

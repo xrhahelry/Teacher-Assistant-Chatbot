@@ -22,11 +22,19 @@
   <!-- Header -->
   <header class="bg-white shadow-sm border-b border-gray-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-4 lg:px-4">
-      <div class="flex justify-between items-center h-16">
+      <div class="flex
+      {% if not request.path.startswith('/chat/') %}
+       justify-between
+       {% else  %}
+       justify-end
+       {% endif %}
+        items-center h-16">
+  
+        {% if not request.path.startswith('/chat/') %}       
+        
         <!-- Logo -->
         <div class="flex items-center">
           <a href="{{ url_for('views.home') }}" target="_self" rel="noopener noreferrer" class="flex items-center">
-
             <div class="flex-shrink-0">
               <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -39,6 +47,8 @@
           </div>
         </a>
         </div>
+        {% endif %}
+
         <div class="flex items-center">
           <!-- Navigation - Only show when user is logged in -->
           {% if session.get("username") %}

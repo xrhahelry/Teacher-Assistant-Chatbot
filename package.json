@@ -1,9 +1,10 @@
 {
   "dependencies": {
     "@tailwindcss/cli": "^4.1.12",
+    "@tailwindcss/typography": "^0.5.16",
     "tailwindcss": "^4.1.12"
   },
   "scripts": {
-    "start":"npx @tailwindcss/cli -i ./app/static/css/input.css -o ./app/static/css/style.css --watch"
+    "start": "npx @tailwindcss/cli -i ./app/static/css/input.css -o ./app/static/css/style.css --watch"
   }
 }

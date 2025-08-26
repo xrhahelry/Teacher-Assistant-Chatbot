@@ -86,9 +86,23 @@
         <!-- Sidebar for Chat History -->
         <div id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50 h-full">
             <!-- Sidebar Header -->
-            <div class="p-4 border-b border-gray-200 flex-shrink-0">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-gray-900">Chat History</h2>
+            <div class="py-4 flex-shrink-0">
+                <div class="mb-5 px-4 ">
+                    <a href="{{ url_for('views.home') }}" target="_self" rel="noopener noreferrer"
+                        class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="ml-1">
+                            <h1 class="text-xl font-semibold text-gray-900">Teacher's Class Assistant</h1>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center justify-between px-4 mb-4 border-t border-slate-300">
                     <button id="closeSidebar" class="text-gray-400 hover:text-gray-600 lg:hidden">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -96,14 +110,17 @@
                         </svg>
                     </button>
                 </div>
-                <a href="{{ url_for('views.onboarding') }}"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    New Chat
-                </a>
+                <div class="px-4">
+                    <a href="{{ url_for('views.onboarding') }}"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2  rounded-lg flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        New Chat
+                    </a>
+                </div>
+
             </div>
 
             <!-- Chat History List -->
@@ -111,7 +128,7 @@
                 <div class="p-4">
                     <div class="mb-6">
                         <div class="flex items-center justify-between mb-3">
-                            <span class="text-gray-400 text-sm font-medium">Chats</span>
+                            <span class="text-gray-400 text-sm font-medium">Chat History</span>
                             <span class="text-gray-500 text-xs">{{ threads|length if threads else 0 }} saved</span>
                         </div>
                     </div>
@@ -227,17 +244,7 @@
                                     <!-- Action Buttons -->
                                     <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
                                         <div class="flex items-center space-x-3">
-                                            <button
-                                                class="regenerate-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                                    </path>
-                                                </svg>
-                                                Regenerate
-                                            </button>
+                                          
                                             <button
                                                 class="copy-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
@@ -265,27 +272,44 @@
             <div
                 class="chat-input-sticky absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
                 <div class="max-w-4xl mx-auto">
-                    <form method="POST" class="flex items-center space-x-4">
-                        <div class="flex-1">
-                            <div class="relative">
-                                <textarea name="user_input" id="chatInput" rows="1"
-                                    class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors max-h-32"
-                                    placeholder="Ask me anything about lesson planning, quizzes, or teaching materials..."
-                                    required></textarea>
+                    <form method="POST" class="">
+                        <div class="flex item-center  space-x-4">
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <textarea name="user_input" id="chatInput" rows="1"
+                                        class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors max-h-48"
+                                        placeholder="Ask me anything about lesson planning, quizzes, or teaching materials..."
+                                        required></textarea>
 
+
+                                </div>
+                            </div>
+                            <!-- Send Button -->
+                            <button type="submit"
+                                class="btn disabled:bg-gray-400 text-white px-3 py-2 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+                                id="sendButton">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mt-0.5 pl-1">
+                            <div class=" bottom-5 right-5 flex items-center space-x-2">
+                                <label for="choice" class="relative inline-block w-9 h-5 cursor-pointer">
+                                    <input type="checkbox" id="choice" class="peer sr-only" name="choice">
+                                    <span
+                                        class="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 dark:bg-neutral-700 dark:peer-checked:bg-blue-500 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                                    <span
+                                        class="absolute top-1/2 start-0.5 -translate-y-1/2 size-4 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full dark:bg-neutral-400 dark:peer-checked:bg-white"></span>
+                                </label>
+                                <label for="choice" class="text-sm text-gray-700 ">Generate Ideas &
+                                    Practice Questions</label>
                             </div>
                         </div>
 
-                        <!-- Send Button -->
-                        <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
-                            id="sendButton">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                            </svg>
-                        </button>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -300,6 +324,19 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const choiceToggle = document.getElementById('choice');
+        if (choiceToggle) {
+            // Restore toggle state from localStorage
+            const saved = localStorage.getItem('chat-choice');
+            if (saved !== null) {
+                choiceToggle.checked = saved === 'on';
+            }
+
+            // Save toggle state on change
+            choiceToggle.addEventListener('change', function () {
+                localStorage.setItem('chat-choice', this.checked ? 'on' : 'off');
+            });
+        }
         const sidebar = document.getElementById('sidebar');
         const toggleSidebar = document.getElementById('toggleSidebar');
         const closeSidebar = document.getElementById('closeSidebar');
@@ -374,10 +411,12 @@
             chatInput.style.height = 'auto';
         });
         // Always scroll chat area to bottom
+
         function scrollChatToBottom() {
             const chatArea = document.querySelector('.chat-scroll.overflow-y-auto');
             if (chatArea) {
                 chatArea.scrollTop = chatArea.scrollHeight;
+
             }
         }
 
@@ -423,37 +462,6 @@
                 if (threadId) {
                     window.location.href = `/chat/${threadId}`;
                 }
-            }
-
-            // Handle regenerate button clicks
-            if (e.target.closest('.regenerate-btn')) {
-                const regenerateBtn = e.target.closest('.regenerate-btn');
-                const messageContainer = regenerateBtn.closest('.flex.items-start.mb-8');
-                const messageText = messageContainer.querySelector('.prose').textContent;
-
-                // Disable the button and show loading state
-                regenerateBtn.disabled = true;
-                regenerateBtn.innerHTML = `
-                        <svg class="w-4 h-4 mr-1 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                        </svg>
-                        Regenerating...
-                    `;
-
-                // Simulate regeneration (you can replace this with actual API call)
-                setTimeout(() => {
-                    // Re-enable button and restore original text
-                    regenerateBtn.disabled = false;
-                    regenerateBtn.innerHTML = `
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                            Regenerate
-                        `;
-
-                    // Show success message
-                    showToast('Message regenerated successfully!');
-                }, 2000);
             }
 
             // Handle copy button clicks
