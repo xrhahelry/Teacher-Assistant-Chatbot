@@ -57,7 +57,6 @@ def logout():
     flash("Logged out.")
     return redirect(url_for("views.home"))
 
-
 @views.route("/")
 def home():
     return render_template("home.html")
@@ -106,6 +105,7 @@ def onboarding():
             The format of your output should be:
             Always answer in full sentences, in structured format, and never give false information. If possible use emojis
             I may also ask you to further refine the output. So please make sure to remember the core topic and don't forget it.
+            You need to necessarily give class activities and evaluation questions, just do normal conversations.
         """
 
         # Create new chat thread
@@ -168,7 +168,6 @@ def chat(thread_id):
         model_name = current_app.config["GM_FLASH2"]
         user_input = request.form.get("user_input")
         choice = request.form.get("choice")
-        choice = "on"
 
         # Save user message
         user_msg = Chat(thread_id=thread_id, user_id=user_id, message=user_input, sender="user")
