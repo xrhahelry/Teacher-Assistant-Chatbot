@@ -11,6 +11,7 @@ class User(db.Model):
     email = db.Column(db.String(128), unique=True, nullable=False)
     default_academic_level = db.Column(db.String(50), nullable=True) 
     default_subject = db.Column(db.String(50), nullable=True)        
+    institution = db.Column(db.String(100), nullable=True)        
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

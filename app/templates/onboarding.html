@@ -28,35 +28,57 @@
         />
       </div>
       
-      <!-- Academic Level -->
-      <div>
-        <label for="academic_level" class="block text-lg font-medium text-gray-900 mb-4">
-          Student's Academic Level
-        </label>
-        <input
-          type="text"
-          id="academic_level"
-          name="academic_level"
-          class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          placeholder="e.g. Grade 5, High School, Undergraduate, etc."
-          required
-        />
-      </div>
+       <!--  Academic Level Field -->
+        <div>
+          <label for="academic_level" class="block text-lg font-medium text-gray-900 mb-4">
+            Student's Academic Level
+          </label>
+          <select id="academic_level" name="academic_level" required
+            class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="">Select Student's Academic Level</option>
+            <option value="elementary">Elementary (K-5)</option>
+            <option value="middle">Middle School (6-8)</option>
+            <option value="high">High School (9-12)</option>
+            <option value="college">College/University</option>
+            <option value="higher">Higher</option>
+          </select>
+        </div>
 
-      <!-- Subject -->
-      <div>
-        <label for="subject" class="block text-lg font-medium text-gray-900 mb-4">
-          Subject
-        </label>
-        <input
-          type="text"
-          id="subject"
-          name="subject"
-          class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-          placeholder="e.g., Mathematics, Biology, English Literature, etc."
-          required
-        />
-      </div>
+        <!-- Subject -->
+        <div>
+          <label for="subject" class="block text-lg font-medium text-gray-900 mb-4">
+            Subject
+          </label>
+          <select id="subject" name="subject" required
+            class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            <option value="">Select Subject</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="science">Science</option>
+            <option value="biology">Biology</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="physics">Physics</option>
+            <option value="english">English/Language Arts</option>
+            <option value="history">History/Social Studies</option>
+            <option value="economics">Economics</option>
+            <option value="arts">Arts & Music</option>
+            <option value="computer science">Computer Science</option>
+            <option value="other">Other</option>
+          </select>
+          
+          <!-- Custom Subject Input (only shown when "Other" is selected) -->
+          <div id="customSubjectContainer" class="mt-4 hidden">
+            <label for="custom_subject" class="block text-lg font-medium text-gray-900 mb-2">
+              Please specify your subject
+            </label>
+            <input
+              type="text"
+              id="custom_subject"
+              name="custom_subject"
+              class="w-full px-6 py-2 border border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              placeholder="e.g. Philosophy, Economics, Psychology..."
+            />
+          </div>
+        </div>
 
       <!-- Help Text -->
       <div class="mt-8 text-center sm:text-left">
@@ -92,9 +114,28 @@
       firstInput.focus();
     }
 
-    // Add smooth animations
+    // Handle subject selection change
+    const subjectSelect = document.getElementById('subject');
+    const customSubjectContainer = document.getElementById('customSubjectContainer');
+    const customSubjectInput = document.getElementById('custom_subject');
+
+    if (subjectSelect && customSubjectContainer && customSubjectInput) {
+      subjectSelect.addEventListener('change', function() {
+        if (this.value === 'other') {
+          customSubjectContainer.classList.remove('hidden');
+          customSubjectInput.required = true;
+          customSubjectInput.focus();
+        } else {
+          customSubjectContainer.classList.add('hidden');
+          customSubjectInput.required = false;
+          customSubjectInput.value = '';
+        }
+      });
+    }
+
+    // Add smooth animations and handle custom subject submission
     const form = document.querySelector('form');
-    form.addEventListener('submit', function() {
+    form.addEventListener('submit', function(e) {           
       const button = form.querySelector('button[type="submit"]');
       button.innerHTML = `
         <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" fill="none" viewBox="0 0 24 24">
@@ -107,7 +148,7 @@
     });
 
     // Enhanced form validation
-    const inputs = form.querySelectorAll('input[required]');
+    const inputs = form.querySelectorAll('input[required], select[required]');
     inputs.forEach(input => {
       input.addEventListener('blur', function() {
         if (!this.value.trim()) {

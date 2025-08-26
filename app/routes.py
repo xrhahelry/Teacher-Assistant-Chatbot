@@ -15,6 +15,7 @@ def signup():
         password = request.form["password"]
         academic_level = request.form["academic-level"]
         subject = request.form["default-subject"]
+        institution = request.form["institution"]
 
         if User.query.filter_by(username=username).first():
             flash("Username already exists")
@@ -28,7 +29,8 @@ def signup():
             fullname=fullname,
             email=email,
             default_academic_level=academic_level,
-            default_subject=subject
+            default_subject=subject,
+            institution=institution
         )
         user.set_password(password)
         db.session.add(user)
@@ -73,6 +75,11 @@ def onboarding():
         title = request.form.get("chat_title")
         academic_level = request.form.get("academic_level")
         subject = request.form.get("subject")
+        custom_sub = request.form.get("custom_subject")
+        if subject == "other":
+            subject = custom_sub
+        print(subject)
+
         user_id = session["user_id"]
 
         # Generate instruction using academic_level and subject
@@ -85,7 +92,8 @@ def onboarding():
             Classroom Manager, Knowledge Organizer, Creative Faciliator, Empathetic Mentor, Global Thinker, Tech Savvy Guide.
             You like to keep a professional setting while still being approachable.
             The format of your output should be:
-            Always answer in full sentences, in structured format, and never give false information. Number the questions and activities. If possible use emojies where appropriate.
+            Always answer in full sentences, in structured format, and never give false information. 
+            Number the questions and activities, like question 1, activity 1. Add line breaks before and after every question and activity. If possible use emojies where appropriate.
             I want you to generate:
             1. Three engaging in-class activities.
             2. Five practice questions with their corresponding answers.
