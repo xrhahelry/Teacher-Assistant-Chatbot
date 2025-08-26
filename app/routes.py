@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, current_app, request, session, redirect, url_for, flash
+from flask import Blueprint, render_template, current_app, request, session, redirect, url_for, flash ,jsonify
 from .chatbot import get_output
 import markdown, re
 from .models import db, User, Chat, ChatThread
@@ -218,3 +218,67 @@ def chat(thread_id):
             rendered_history.append({"sender": "user", "message": msg.message})
 
     return render_template("chat.html", response=response, chat_history=rendered_history, thread=thread, user=user, threads=user_threads)
+
+
+
+@views.route("/msg/<int:thread_id>", methods=["POST"])
+def msg(thread_id):
+    if not session.get("user_id"):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    user_id = session["user_id"]
+    thread = ChatThread.query.filter_by(id=thread_id, user_id=user_id).first_or_404()
+    user = User.query.get(user_id)
+    chat_history = Chat.query.filter_by(thread_id=thread_id).order_by(Chat.timestamp).all()
+    
+    # Get user input from JSON or form data
+    if request.is_json:
+        user_input = request.json.get("user_input") if request.json else None
+    else:
+        user_input = request.form.get("user_input")
+    
+    if not user_input:
+        return jsonify({"error": "No user input provided"}), 400
+
+    api_key = current_app.config["GEMINI_KEY"]
+    model_name = current_app.config["GM_FLASH2"]
+
+    # Save user message
+    user_msg = Chat(thread_id=thread_id, user_id=user_id, message=user_input, sender="user")
+    db.session.add(user_msg)
+    db.session.commit()
+
+    # Build context from chat_history + new user message
+    context = ""
+    for msg in chat_history + [user_msg]:
+        sender = "You" if msg.sender == "user" else "Bot"
+        context += f"{sender}: {msg.message}\n"
+
+    # Use instruction from thread and name from user
+    instruction = thread.instruction
+    name = user.username if user else "Teacher"
+
+    prompt = f"""
+        {instruction}
+        Teacher's name: {name}
+        Here is our previous conversation:
+        {context}
+
+        What I asked you:
+        {user_input}
+    """
+    response = get_output(api_key, model_name, prompt)
+
+    # Save bot response
+    bot_msg = Chat(thread_id=thread_id, user_id=user_id, message=response, sender="bot")
+    db.session.add(bot_msg)
+    db.session.commit()
+
+    # Process LaTeX and convert to HTML for response
+    processed_response = preprocess_latex(response)
+    response_html = markdown.markdown(processed_response, extensions=['nl2br'])
+
+    return jsonify({
+        "response": response_html,
+        "success": True
+    })
