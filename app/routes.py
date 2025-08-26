@@ -8,7 +8,6 @@ views = Blueprint("views", __name__)
 @views.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
-        print("POST")
         fullname = request.form["fullname"]
         email = request.form["email"]
         username = request.form["username"]
@@ -78,7 +77,6 @@ def onboarding():
         custom_sub = request.form.get("custom_subject")
         if subject == "other":
             subject = custom_sub
-        print(subject)
 
         user_id = session["user_id"]
 
@@ -91,6 +89,7 @@ def onboarding():
             The traits you should have is: 
             Classroom Manager, Knowledge Organizer, Creative Faciliator, Empathetic Mentor, Global Thinker, Tech Savvy Guide.
             You like to keep a professional setting while still being approachable.
+            Warn me and don't give any additional response. When I try to teach topics that are too advanced for the classes I am teaching.
             The format of your output should be:
             Always answer in full sentences, in structured format, and never give false information. 
             Number the questions and activities, like question 1, activity 1. Add line breaks before and after every question and activity. If possible use emojies where appropriate.
@@ -110,6 +109,7 @@ def onboarding():
             The traits you should have is: 
             Classroom Manager, Knowledge Organizer, Creative Faciliator, Empathetic Mentor, Global Thinker, Tech Savvy Guide.
             You like to keep a professional setting while still being approachable.
+            Warn me and don't give any additional response. When I try to teach topics that are too advanced for the classes I am teaching.
             The format of your output should be:
             Always answer in full sentences, in structured format, and never give false information. If possible use emojis
             I may also ask you to further refine the output. So please make sure to remember the core topic and don't forget it.
