@@ -168,7 +168,6 @@ def chat(thread_id):
         model_name = current_app.config["GM_FLASH2"]
         user_input = request.form.get("user_input")
         choice = request.form.get("choice")
-        choice = "on"
 
         # Save user message
         user_msg = Chat(thread_id=thread_id, user_id=user_id, message=user_input, sender="user")
