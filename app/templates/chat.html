@@ -4,12 +4,30 @@
 
 {% block styles %}
 <style>
+    /* Prevent page-level scrolling - Override base.html styles */
+    html {
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    body {
+        height: 100vh !important;
+        min-height: 100vh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
     /* Ensure proper height without preventing scroll */
     main {
-        /* height: 100vh !important; */
-        /* Full viewport height since no header */
-        /* overflow: hidden !important; */
-        /* Only hide main overflow, not content areas */
+        height: calc(100vh - 4rem); /* Subtract header height (h-16 = 4rem = 64px) */
+        overflow: hidden; /* Prevent main from scrolling */
+        flex: none; /* Don't grow or shrink */
+    }
+
+    /* Ensure no margins or padding cause overflow */
+    header {
+        flex-shrink: 0;
     }
 
     /* Ensure scrollable containers work properly */
@@ -75,16 +93,29 @@
         border-top: 1px solid #e5e7eb;
         box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
     }
+
+    /* Custom container classes for targeting */
+    .messages-wrapper {
+        width: 100%;
+        max-width: 72rem; /* equivalent to max-w-6xl */
+        margin: 0 auto;
+    }
+
+    .input-wrapper {
+        width: 100%;
+        max-width: 56rem; /* equivalent to max-w-4xl */
+        margin: 0 auto;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Main Content -->
-<main class="flex-1">
+<main>
 
     <div class="flex h-full bg-white relative w-full">
         <!-- Sidebar for Chat History -->
-        <div id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50 h-full">
+        <div id="sidebar" class="w-72 bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50 h-screen">
             <!-- Sidebar Header -->
             <div class="py-4 flex-shrink-0">
                 <div class="mb-1 px-4 ">
@@ -97,12 +128,12 @@
                                 </path>
                             </svg>
                         </div>
-                        <div class="ml-1">
+                        <div class="ml-2">
                             <h1 class="text-xl font-semibold text-gray-900">Teacher's Class Assistant</h1>
                         </div>
                     </a>
                 </div>
-                <div class="flex items-center justify-between px-4 mb-4 border-t border-slate-300 px-4">
+                <div class="flex items-center justify-between px-4 mb-4 border-t border-slate-300">
                     <button id="closeSidebar" class="text-gray-400 hover:text-gray-600 lg:hidden">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -173,11 +204,11 @@
         </div>
 
         <!-- Main Chat Area -->
-        <div class="flex-1 flex flex-col min-w-0 ml-72 relative h-screen">
+        <div class="flex-1 flex flex-col min-w-0 ml-72 relative h-full">
             <!-- Chat Messages Area -->
             <div class="flex-1 chat-scroll overflow-y-auto pb-24" style="min-height: 0;">
                 <div class="p-6">
-                    <div class="max-w-6xl mx-auto">
+                    <div id="chat-messages-container" class="messages-wrapper max-w-6xl mx-auto">
                         <!-- Welcome Message -->
                         <div class="flex items-start mb-8">
                             <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-4 mt-1">
@@ -193,7 +224,7 @@
                                             ✨
                                         </span>
                                         <span class="text-lg font-medium text-gray-900">Hey there! I'm your helpful
-                                            virtual assistant.</span>
+                                            Virtual Assistant.</span>
                                     </div>
 
                                     <div class="space-y-4 text-gray-700">
@@ -270,7 +301,7 @@
             <!-- Fixed Chat Input at Bottom -->
             <div
                 class="chat-input-sticky absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
-                <div class="max-w-4xl mx-auto">
+                <div id="chat-input-container" class="input-wrapper max-w-4xl mx-auto">
                     <form method="POST" class="">
                         <div class="flex item-center  space-x-4">
                             <div class="flex-1">
@@ -475,7 +506,12 @@
         // Add thinking animation
         function addThinkingAnimation() {
             const chatArea = document.querySelector('.chat-scroll.overflow-y-auto');
-            const messagesContainer = chatArea.querySelector('.max-w-4xl');
+            const messagesContainer = document.getElementById('chat-messages-container');
+            
+            if (!messagesContainer) {
+                console.error('Messages container not found');
+                return;
+            }
             
             const thinkingHtml = `
                 <div class="flex items-start mb-8" id="thinking-animation">
@@ -520,7 +556,12 @@
             removeThinkingAnimation();
             
             const chatArea = document.querySelector('.chat-scroll.overflow-y-auto');
-            const messagesContainer = chatArea.querySelector('.max-w-4xl');
+            const messagesContainer = document.getElementById('chat-messages-container');
+            
+            if (!messagesContainer) {
+                console.error('Messages container not found');
+                return;
+            }
             
             const botMessageHtml = `
                 <div class="flex items-start mb-8">
@@ -537,15 +578,7 @@
                             
                             <!-- Action Buttons -->
                             <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-                                <div class="flex items-center space-x-3">
-                                    <button class="regenerate-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
-                                            </path>
-                                        </svg>
-                                        Regenerate
-                                    </button>
+                                <div class="flex items-center space-x-3">                                   
                                     <button class="copy-btn flex items-center text-sm text-gray-500 hover:text-gray-700">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -578,7 +611,12 @@
 
         function addUserMessage(message) {
             const chatArea = document.querySelector('.chat-scroll.overflow-y-auto');
-            const messagesContainer = chatArea.querySelector('.max-w-4xl');
+            const messagesContainer = document.getElementById('chat-messages-container');
+            
+            if (!messagesContainer) {
+                console.error('Messages container not found');
+                return;
+            }
             
             const messageHtml = `
                 <div class="flex items-start justify-end mb-8">
