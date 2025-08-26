@@ -25,10 +25,18 @@
                     <p class="text-lg sm:text-xl text-white/95 mb-10 drop-shadow-lg max-w-3xl mx-auto leading-relaxed">
                         Class Assistant Chatbot is a web-based AI tool designed to help university lecturers quickly generate structured lesson ideas and topic-specific practice questions.
                     </p>
+
+                    {% if session.get("username") %}
+                    <a href="{{ url_for('views.onboarding') }}"
+                        class="btn">
+                        Start Chatting
+                    </a>                       
+                    {% else %}   
                     <a href="{{ url_for('views.onboarding') }}"
                         class="btn">
                         Get Started
-                    </a>
+                    </a>                       
+                    {% endif %}
                 </div>
             </div>
         </div>
