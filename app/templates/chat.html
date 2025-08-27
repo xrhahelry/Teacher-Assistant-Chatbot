@@ -441,6 +441,9 @@
             // Add user message to chat immediately
             const userMessage = chatInput.value;
             addUserMessage(userMessage);
+
+            const choiceCheckbox = document.getElementById('choice');
+            const choice = choiceCheckbox && choiceCheckbox.checked ? 'on' : null;
             
             // Show thinking animation
             addThinkingAnimation();
@@ -451,10 +454,10 @@
             chatInput.style.height = 'auto';
 
             // Send message via API
-            sendMessageToAPI(threadId, inputValue);
+            sendMessageToAPI(threadId, inputValue, choice);
         });
         // Send message via API
-        async function sendMessageToAPI(threadId, userInput) {
+        async function sendMessageToAPI(threadId, userInput, choice) {
             try {
                 const response = await fetch(`/msg/${threadId}`, {
                     method: 'POST',
@@ -463,7 +466,8 @@
                     },
                     credentials: 'same-origin', // Include session cookies
                     body: JSON.stringify({
-                        user_input: userInput
+                        user_input: userInput,
+                        choice: choice
                     })
                 });
 

@@ -241,8 +241,10 @@ def msg(thread_id):
     # Get user input from JSON or form data
     if request.is_json:
         user_input = request.json.get("user_input") if request.json else None
+        choice = request.json.get("choice") if request.json else None
     else:
         user_input = request.form.get("user_input")
+        choice = request.form.get("choice")
     
     if not user_input:
         return jsonify({"error": "No user input provided"}), 400
@@ -262,7 +264,11 @@ def msg(thread_id):
         context += f"{sender}: {msg.message}\n"
 
     # Use instruction from thread and name from user
-    instruction = thread.instruction
+    if choice == None:
+        instruction = thread.altinstruction
+    else:
+        instruction = thread.instruction
+
     name = user.username if user else "Teacher"
 
     prompt = f"""
